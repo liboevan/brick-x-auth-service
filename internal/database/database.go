@@ -14,6 +14,9 @@ type User struct {
 	Username     string
 	PasswordHash string
 	Role         string
+	FirstName    string
+	LastName     string
+	Email        string
 }
 
 type Role struct {
@@ -35,7 +38,7 @@ func NewDatabase(dbPath string) (*Database, error) {
 
 // User CRUD
 func (d *Database) GetUsers() ([]User, error) {
-	rows, err := d.DB.Query("SELECT username, password_hash, role FROM users")
+	rows, err := d.DB.Query("SELECT username, password_hash, role, first_name, last_name, email FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +46,7 @@ func (d *Database) GetUsers() ([]User, error) {
 	var users []User
 	for rows.Next() {
 		var u User
-		if err := rows.Scan(&u.Username, &u.PasswordHash, &u.Role); err != nil {
+		if err := rows.Scan(&u.Username, &u.PasswordHash, &u.Role, &u.FirstName, &u.LastName, &u.Email); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
@@ -52,16 +55,16 @@ func (d *Database) GetUsers() ([]User, error) {
 }
 
 func (d *Database) GetUser(username string) (*User, error) {
-	row := d.DB.QueryRow("SELECT username, password_hash, role FROM users WHERE username = ?", username)
+	row := d.DB.QueryRow("SELECT username, password_hash, role, first_name, last_name, email FROM users WHERE username = ?", username)
 	var u User
-	if err := row.Scan(&u.Username, &u.PasswordHash, &u.Role); err != nil {
+	if err := row.Scan(&u.Username, &u.PasswordHash, &u.Role, &u.FirstName, &u.LastName, &u.Email); err != nil {
 		return nil, err
 	}
 	return &u, nil
 }
 
 func (d *Database) CreateUser(username, passwordHash, role string) error {
-	_, err := d.DB.Exec("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)", username, passwordHash, role)
+	_, err := d.DB.Exec("INSERT INTO users (username, password_hash, role, first_name, last_name, email) VALUES (?, ?, ?, ?, ?, ?)", username, passwordHash, role, "", "", "")
 	return err
 }
 

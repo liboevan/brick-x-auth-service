@@ -42,6 +42,7 @@ func (a *App) setupRoutes() {
 	authRouter.HandleFunc("/login", a.loginHandler).Methods("POST")
 	authRouter.HandleFunc("/exchange", a.exchangeHandler).Methods("POST")
 	authRouter.HandleFunc("/validate", a.validateHandler).Methods("POST")
+	authRouter.HandleFunc("/me", a.meHandler).Methods("GET")
 	authRouter.HandleFunc("/auth-type", a.requirePermission(a.getAuthTypeHandler, "x/layout:read")).Methods("GET")
 	authRouter.HandleFunc("/auth-type", a.requirePermission(a.setAuthTypeHandler, "x/layout:write")).Methods("POST")
 
@@ -152,6 +153,34 @@ func (a *App) validateHandler(w http.ResponseWriter, r *http.Request) {
 		Valid:   valid,
 		UserInfo: userInfo,
 	})
+}
+
+func (a *App) meHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract token from Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Authorization header required", http.StatusUnauthorized)
+		return
+	}
+
+	// Check if it's a Bearer token
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Invalid authorization format", http.StatusUnauthorized)
+		return
+	}
+
+	// Extract token
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Validate token and get user info
+	valid, userInfo, err := a.authManager.ValidateToken(token)
+	if err != nil || !valid {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userInfo)
 }
 
 func (a *App) disableLocalLoginHandler(w http.ResponseWriter, r *http.Request) {

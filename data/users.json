@@ -2,21 +2,33 @@
   {
     "username": "x-operator",
     "password": "x-operator",
-    "role": "x-operator"
+    "role": "x-operator",
+    "first_name": "Operator",
+    "last_name": "X",
+    "email": "operator@brickx.com"
   },
   {
     "username": "x-observer",
     "password": "x-observer",
-    "role": "x-observer"
+    "role": "x-observer",
+    "first_name": "Observer",
+    "last_name": "X",
+    "email": "observer@brickx.com"
   },
   {
     "username": "x-guest",
     "password": "x-guest",
-    "role": "x-guest"
+    "role": "x-guest",
+    "first_name": "Guest",
+    "last_name": "X",
+    "email": "guest@brickx.com"
   },
   {
     "username": "x-superadmin",
     "password": "x-superadmin",
-    "role": "x-superadmin"
+    "role": "x-superadmin",
+    "first_name": "Superadmin",
+    "last_name": "X",
+    "email": "superadmin@brickx.com"
   }
 ] 

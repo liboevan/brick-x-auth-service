@@ -1,3 +1,5 @@
+[English](README.en.md) | 中文
+
 # Brick X Auth Service
 
 Brick X 认证服务，提供 JWT 令牌生成和验证功能。
@@ -8,6 +10,7 @@ Brick X 认证服务，提供 JWT 令牌生成和验证功能。
 - **JWT 令牌生成** - 用户登录后生成访问令牌
 - **RSA 密钥管理** - 使用 RSA 密钥对进行令牌签名
 - **用户认证** - 验证用户名和密码
+- **用户管理** - 支持用户信息（姓名、邮箱等）
 - **健康检查** - 提供 `/health` 端点
 - **容器化部署** - 完整的 Docker 支持
 
@@ -24,8 +27,6 @@ Brick X 认证服务，提供 JWT 令牌生成和验证功能。
 ```bash
 ./scripts/build.sh
 ```
-
-
 
 ### 启动服务
 ```bash
@@ -47,51 +48,11 @@ Brick X 认证服务，提供 JWT 令牌生成和验证功能。
 ./scripts/run.sh stop
 ```
 
-### 完整开发工作流
-```bash
-# 方式一：一键完成
-./scripts/build.sh && ./scripts/start.sh && ./scripts/test.sh all
-
-# 方式二：分步执行
-./scripts/build.sh             # 构建
-./scripts/start.sh             # 启动
-./scripts/test.sh all          # 测试
-./scripts/stop.sh --remove     # 停止并删除容器
-./scripts/clean.sh             # 清理镜像
-```
-
-### 容器管理
-```bash
-# 启动服务
-./scripts/start.sh
-
-# 强制重启
-./scripts/start.sh --force
-
-# 查看状态
-docker ps --filter name=el-brick-x-auth
-
-# 查看日志
-docker logs el-brick-x-auth
-
-# 停止服务
-./scripts/stop.sh              # 停止服务
-./scripts/stop.sh --remove     # 停止并删除容器
-
-# 清理容器和镜像
-./scripts/clean.sh                    # 清理容器和最新镜像
-./scripts/clean.sh --container        # 仅清理容器
-./scripts/clean.sh --image v1.0.0     # 清理特定版本镜像
-./scripts/clean.sh --all --force      # 强制清理所有
-```
-
 ## 📋 脚本
 
 ### 构建脚本
 - **`scripts/build.sh`** - 构建 Docker 镜像
 - **`scripts/gen-go-sum.sh`** - 生成 go.sum 文件
-
-
 
 ### 运行脚本
 - **`scripts/start.sh`** - 启动服务
@@ -109,7 +70,8 @@ docker logs el-brick-x-auth
 
 ### 端点
 - `GET /health` - 健康检查
-- `POST /login` - 用户登录
+- `POST /auth/login` - 用户登录
+- `GET /auth/me` - 获取当前用户信息
 - `GET /build-info.json` - 构建信息
 - `GET /VERSION` - 版本信息
 
@@ -117,16 +79,22 @@ docker logs el-brick-x-auth
 
 ### 登录请求
 ```bash
-curl -X POST http://localhost:17101/login \
+curl -X POST http://localhost:17101/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"x-admin","password":"admin123"}'
+  -d '{"username":"x-operator","password":"x-operator"}'
+```
+
+### 获取用户信息
+```bash
+curl -X GET http://localhost:17101/auth/me \
+  -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 ### 响应格式
 ```json
 {
   "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expires_in": 3600
+  "type": "Bearer"
 }
 ```
 
@@ -138,8 +106,9 @@ curl -X POST http://localhost:17101/login \
 - **格式**: PKCS8/PKCS1 自动检测
 
 ### 用户管理
-- 默认用户: `x-admin` / `admin123`
-- 密码验证: bcrypt (临时使用简单字符串比较)
+- 默认用户: `x-operator`, `x-observer`, `x-guest`, `x-superadmin`
+- 用户信息: 包含姓名、邮箱等详细信息
+- 密码验证: bcrypt
 
 ## 📊 监控
 
@@ -172,13 +141,6 @@ curl http://localhost:17101/VERSION
 ./scripts/test.sh login    # 登录功能
 ./scripts/test.sh invalid  # 无效端点
 ```
-
-### 测试覆盖
-- ✅ **健康检查** - `/health` 端点
-- ✅ **构建信息** - `/build-info.json` 端点
-- ✅ **版本信息** - `/VERSION` 端点
-- ✅ **登录功能** - `/login` 端点（成功/失败/无效JSON）
-- ✅ **错误处理** - 404、405 等错误响应
 
 ## 🐛 故障排除
 
