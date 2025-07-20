@@ -1,0 +1,10 @@
+{
+  "server": {
+    "port": 17101
+  },
+  "jwt": {
+    "private_key_path": "/app/private.pem",
+    "public_key_path": "/app/public.pem",
+    "expiration_hours": 24
+  }
+}

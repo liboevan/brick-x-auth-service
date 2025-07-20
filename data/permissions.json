@@ -1,0 +1,15 @@
+[
+  "x/core:read",
+  "x/core:write",
+  "x/clock:read",
+  "x/clock:write",
+  "x/remote_storage:read",
+  "x/remote_storage:write",
+  "x/system_status:read",
+  "x/system_status:write",
+  "x/layout:read",
+  "x/layout:write",
+  "user:read", "user:write",
+  "role:read", "role:write",
+  "permission:read", "permission:write"
+] 

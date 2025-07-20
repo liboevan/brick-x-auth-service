@@ -1,0 +1,41 @@
+[
+  {
+    "name": "x-observer",
+    "permissions": [
+      "x/core:read",
+      "x/clock:read",
+      "x/remote_storage:read",
+      "x/system_status:read",
+      "x/layout:read"
+    ]
+  },
+  {
+    "name": "x-operator",
+    "permissions": [
+      "x/core:read", "x/core:write",
+      "x/clock:read", "x/clock:write",
+      "x/remote_storage:read", "x/remote_storage:write",
+      "x/system_status:read", "x/system_status:write",
+      "x/layout:read"
+    ]
+  },
+  {
+    "name": "x-guest",
+    "permissions": [
+      "x/core:read"
+    ]
+  },
+  {
+    "name": "x-superadmin",
+    "permissions": [
+      "x/core:read", "x/core:write",
+      "x/clock:read", "x/clock:write",
+      "x/remote_storage:read", "x/remote_storage:write",
+      "x/system_status:read", "x/system_status:write",
+      "x/layout:read", "x/layout:write",
+      "user:read", "user:write",
+      "role:read", "role:write",
+      "permission:read", "permission:write"
+    ]
+  }
+] 

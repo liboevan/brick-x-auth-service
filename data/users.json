@@ -1,0 +1,22 @@
+[
+  {
+    "username": "x-operator",
+    "password": "x-operator",
+    "role": "x-operator"
+  },
+  {
+    "username": "x-observer",
+    "password": "x-observer",
+    "role": "x-observer"
+  },
+  {
+    "username": "x-guest",
+    "password": "x-guest",
+    "role": "x-guest"
+  },
+  {
+    "username": "x-superadmin",
+    "password": "x-superadmin",
+    "role": "x-superadmin"
+  }
+] 
