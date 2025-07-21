@@ -29,7 +29,7 @@ func Load() (*Config, error) {
 			Expiration:     24,
 		},
 	}
-	// 优先 /etc/brick-x-auth/config.json
+	// Try loading from /etc/brick-x-auth/config.json first
 	if _, err := os.Stat("/etc/brick-x-auth/config.json"); err == nil {
 		file, err := os.Open("/etc/brick-x-auth/config.json")
 		if err != nil {

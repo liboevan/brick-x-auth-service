@@ -196,7 +196,7 @@ func (a *App) disableLocalLoginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// getAuthTypeHandler/setAuthTypeHandler 返回固定值 "local"
+// Returns fixed value "local" for auth type
 func (a *App) getAuthTypeHandler(w http.ResponseWriter, r *http.Request) {
 	type resp struct {
 		AuthType string `json:"auth_type"`
@@ -280,7 +280,7 @@ func (a *App) enableLocalLoginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// 用户管理
+// User Management API Handlers
 func (a *App) getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := a.authManager.GetUsers()
 	if err != nil {
@@ -335,7 +335,7 @@ func (a *App) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "User deleted"})
 }
-// 角色管理
+// Role Management API Handlers
 func (a *App) getRolesHandler(w http.ResponseWriter, r *http.Request) {
 	roles, err := a.authManager.GetRoles()
 	if err != nil {
@@ -388,7 +388,7 @@ func (a *App) deleteRoleHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Role deleted"})
 }
-// 权限管理
+// Permission Management API Handlers
 func (a *App) getPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	perms, err := a.authManager.GetPermissions()
 	if err != nil {

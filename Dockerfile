@@ -33,8 +33,12 @@ RUN echo "{\"version\":\"$VERSION\",\"buildDateTime\":\"$BUILD_DATETIME\",\"buil
 # Final stage
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates wget
+# Install dependencies
+RUN apk update && \
+    apk add --no-cache ca-certificates && \
+    apk add --no-cache curl
 
+# Set working directory
 WORKDIR /app
 
 # 二进制
