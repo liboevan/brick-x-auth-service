@@ -26,8 +26,8 @@ print_error() {
 }
 
 # Container and image configuration
-CONTAINER_NAME="el-brick-x-auth"
-IMAGE_NAME="el/brick-x-auth"
+CONTAINER_NAME="brick-x-auth"
+IMAGE_NAME="brick-x-auth"
 DEFAULT_VERSION="latest"
 
 # Function to show help
@@ -223,4 +223,4 @@ if [[ $# -eq 0 ]]; then
     main_cleanup
 else
     main_cleanup "$@"
-fi 
+fi

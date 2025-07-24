@@ -183,7 +183,7 @@ curl http://localhost:17101/VERSION
 curl http://localhost:17101/health
 
 # Check container details
-docker inspect el-brick-x-auth
+docker inspect brick-x-auth
 ```
 
 ## 🎯 Best Practices
@@ -201,4 +201,4 @@ For issues or questions:
 2. View service logs: `./scripts/run.sh logs`
 3. Verify configuration: Check `config.json`
 4. Confirm key files: Check `private.pem` and `public.pem`
-5. Test endpoints: Use curl to test API endpoints 
+5. Test endpoints: Use curl to test API endpoints

@@ -5,10 +5,10 @@
 
 # Project Configuration
 PROJECT_NAME="brick-x-auth-service"
-IMAGE_NAME="el/brick-x-auth"
-CONTAINER_NAME="el-brick-x-auth"
+IMAGE_NAME="brick-x-auth"
+CONTAINER_NAME="brick-x-auth"
 API_PORT="17101"
-NETWORK_NAME="el-brick-x-network"
+NETWORK_NAME="brick-x-network"
 DEFAULT_VERSION="0.1.0-dev"  # Default version for build
 RUN_VERSION="0.1.0-dev"      # Version for start/stop operations
 

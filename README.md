@@ -183,7 +183,7 @@ curl http://localhost:17101/VERSION
 curl http://localhost:17101/health
 
 # 检查容器详情
-docker inspect el-brick-x-auth
+docker inspect brick-x-auth
 ```
 
 ## 🎯 最佳实践
@@ -201,4 +201,4 @@ docker inspect el-brick-x-auth
 2. 查看服务日志: `./scripts/run.sh logs`
 3. 验证配置文件: 检查 `config.json`
 4. 确认密钥文件: 检查 `private.pem` 和 `public.pem`
-5. 测试端点: 使用 curl 测试 API 端点 
+5. 测试端点: 使用 curl 测试 API 端点
