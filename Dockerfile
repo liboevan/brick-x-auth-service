@@ -19,19 +19,23 @@ ARG BUILD_DATETIME
 ENV VERSION=$VERSION
 ENV BUILD_DATETIME=$BUILD_DATETIME
 
-# Build the application
-RUN go build -a -o auth ./cmd/auth && \
-    go build -a -o seeder ./cmd/seeder && \
-    go build -a -o token-decoder ./cmd/token-decoder
+# Build the application with version and build datetime injected
+RUN go build -a -ldflags "-X 'internal/app.AppVersion=$VERSION' -X 'internal/app.BuildDateTime=$BUILD_DATETIME'" -o auth ./cmd/auth && \
+    go build -a -ldflags "-X 'internal/app.AppVersion=$VERSION' -X 'internal/app.BuildDateTime=$BUILD_DATETIME'" -o seeder ./cmd/seeder && \
+    go build -a -ldflags "-X 'internal/app.AppVersion=$VERSION' -X 'internal/app.BuildDateTime=$BUILD_DATETIME'" -o token-decoder ./cmd/token-decoder
 
-# Create VERSION file
-RUN echo "$VERSION" > /app/VERSION
+# Generate VERSION file
+RUN echo ${VERSION} > /app/VERSION
 
-# Create build-info.json
-RUN echo "{\"version\":\"$VERSION\",\"buildDateTime\":\"$BUILD_DATETIME\",\"buildTimestamp\":$(date +%s),\"environment\":\"production\",\"service\":\"brick-x-auth-service\",\"description\":\"Authentication Service\"}" > /app/build-info.json
+# Generate build-info.json file
+RUN echo '{"version":"'${VERSION}'","buildDateTime":"'${BUILD_DATETIME}'","buildTimestamp":'$(date +%s)',"service":"brick-x-auth-service","description":"Authentication service for Brick X platform"}' > /app/build-info.json
 
 # Final stage
 FROM alpine:latest
+
+# Copy build information files from builder stage
+COPY --from=builder /app/VERSION /app/VERSION
+COPY --from=builder /app/build-info.json /app/build-info.json
 
 # Install dependencies
 RUN apk update && \
@@ -55,14 +59,10 @@ COPY data/ /app/init/
 COPY private.pem /app/
 COPY public.pem /app/
 
-# 版本和构建信息
-COPY --from=builder /app/VERSION /app/VERSION
-COPY --from=builder /app/build-info.json /app/build-info.json
-
 # entrypoint
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 VOLUME /var/lib/brick-x-auth /var/log/brick-x-auth
 EXPOSE 17101
-CMD ["/app/entrypoint.sh"] 
+CMD ["/app/entrypoint.sh"]

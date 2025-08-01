@@ -7,11 +7,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
+)
+
+// Version and build info (will be replaced during build)
+var (
+	AppVersion    = "0.1.0-dev"
+	BuildDateTime = "2025-07-05T10:00:00Z"
 )
 
 type App struct {
@@ -33,9 +38,8 @@ func NewApp(config *config.Config, authManager auth.AuthManager) *App {
 func (a *App) setupRoutes() {
 	// Health check
 	a.router.HandleFunc("/health", a.healthHandler).Methods("GET")
-	// Build info
-	a.router.HandleFunc("/build-info.json", a.buildInfoHandler).Methods("GET")
-	a.router.HandleFunc("/VERSION", a.versionHandler).Methods("GET")
+	// Version info
+	a.router.HandleFunc("/version", a.versionHandler).Methods("GET")
 
 	// Auth API routes
 	authRouter := a.router.PathPrefix("/auth").Subrouter()
@@ -71,28 +75,52 @@ func (a *App) healthHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (a *App) buildInfoHandler(w http.ResponseWriter, r *http.Request) {
-	// Read build info from file
-	data, err := os.ReadFile("/app/build-info.json")
-	if err != nil {
-		http.Error(w, "Build info not available", http.StatusNotFound)
-		return
+
+
+// BuildInfo contains build metadata
+ type BuildInfo struct {
+	Version        string `json:"version"`
+	BuildDateTime  string `json:"buildDateTime"`
+	BuildTimestamp int64  `json:"buildTimestamp"`
+	Service        string `json:"service"`
+	Description    string `json:"description"`
+}
+
+// VersionResponse represents the version information response
+ type VersionResponse struct {
+	Version   string     `json:"version"`
+	BuildInfo *BuildInfo `json:"buildInfo,omitempty"`
+}
+
+// loadBuildInfo returns build information from compiled-in values
+func (a *App) loadBuildInfo() *BuildInfo {
+	// Parse build date time to timestamp
+	buildTime, _ := time.Parse(time.RFC3339, BuildDateTime)
+	
+buildInfo := &BuildInfo{
+		Version:        AppVersion,
+		BuildDateTime:  BuildDateTime,
+		BuildTimestamp: buildTime.Unix(),
+		Service:        "brick-x-auth-service",
+		Description:    "Authentication and authorization service for Brick-X platform",
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Write(data)
+	return buildInfo
 }
 
 func (a *App) versionHandler(w http.ResponseWriter, r *http.Request) {
-	// Read version from file
-	data, err := os.ReadFile("/app/VERSION")
-	if err != nil {
-		http.Error(w, "Version not available", http.StatusNotFound)
-		return
+	// Load build info
+	buildInfo := a.loadBuildInfo()
+
+	// Create version response
+	response := VersionResponse{
+		Version:   buildInfo.Version,
+		BuildInfo: buildInfo,
 	}
-	w.Header().Set("Content-Type", "text/plain")
+
+	// Return JSON response
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Write(data)
+	json.NewEncoder(w).Encode(response)
 }
 
 func (a *App) loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -416,4 +444,4 @@ func (a *App) Run() error {
 	addr := fmt.Sprintf(":%d", a.config.Server.Port)
 	log.Printf("Starting brick-x-auth-service on %s", addr)
 	return http.ListenAndServe(addr, a.router)
-} 
+}

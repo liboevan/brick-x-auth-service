@@ -69,6 +69,8 @@ test_health() {
     echo ""
 }
 
+
+
 # Function to test build info endpoint
 test_build_info() {
     print_status "Testing build info endpoint..."
@@ -78,8 +80,14 @@ test_build_info() {
     local body="${response%???}"
     
     if [ "$status_code" = "200" ]; then
-        echo -e "${GREEN}✓ Build info check passed${NC}"
-        echo "Response: $body"
+        # Check if response is valid JSON
+        if echo "$body" | jq . >/dev/null 2>&1; then
+            echo -e "${GREEN}✓ Build info check passed${NC}"
+            echo "Response: $body"
+        else
+            echo -e "${RED}✗ Build info check failed: Response is not valid JSON${NC}"
+            return 1
+        fi
     else
         echo -e "${RED}✗ Build info check failed (HTTP $status_code)${NC}"
         return 1
@@ -92,13 +100,19 @@ test_build_info() {
 test_version() {
     print_status "Testing version endpoint..."
     
-    local response=$(curl -s -w "%{http_code}" "$SERVICE_URL/VERSION")
+    local response=$(curl -s -w "%{http_code}" "$SERVICE_URL/version")
     local status_code="${response: -3}"
     local body="${response%???}"
     
     if [ "$status_code" = "200" ]; then
-        echo -e "${GREEN}✓ Version check passed${NC}"
-        echo "Version: $body"
+        # Check if response is valid JSON
+        if echo "$body" | jq . >/dev/null 2>&1; then
+            echo -e "${GREEN}✓ Version check passed${NC}"
+            echo "Response: $body"
+        else
+            echo -e "${RED}✗ Version check failed: Response is not valid JSON${NC}"
+            return 1
+        fi
     else
         echo -e "${RED}✗ Version check failed (HTTP $status_code)${NC}"
         return 1
@@ -312,6 +326,9 @@ case "${1:-all}" in
     "build")
         wait_for_service && test_build_info
         ;;
+    "build")
+        wait_for_service && test_build_info
+        ;;
     "version")
         wait_for_service && test_version
         ;;
@@ -329,4 +346,4 @@ case "${1:-all}" in
         show_help
         exit 1
         ;;
-esac 
+esac

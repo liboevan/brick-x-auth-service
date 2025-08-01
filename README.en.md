@@ -72,8 +72,8 @@ Brick X authentication service providing JWT token generation and validation fun
 - `GET /health` - Health check
 - `POST /auth/login` - User login
 - `GET /auth/me` - Get current user information
-- `GET /build-info.json` - Build information
-- `GET /VERSION` - Version information
+- `GET /version` - Version information (returns JSON format with version and build info)
+- `GET /build-info.json` - Build information (returns JSON format)
 
 ## 🔐 Authentication
 
@@ -117,14 +117,41 @@ curl -X GET http://localhost:17101/auth/me \
 curl http://localhost:17101/health
 ```
 
+### Version Information
+```bash
+curl http://localhost:17101/version
+```
+
+Response format example:
+```json
+{
+  "version": "0.1.0-dev",
+  "buildInfo": {
+    "buildDateTime": "2023-10-20T12:34:56Z",
+    "environment": "production",
+    "service": "brick-x-auth-service"
+  }
+}
+```
+
 ### Build Information
 ```bash
 curl http://localhost:17101/build-info.json
 ```
 
-### Version Information
+Response format example:
+```json
+{
+  "version": "0.1.0-dev",
+  "buildDateTime": "2023-10-20T12:34:56Z",
+  "buildTimestamp": 1697805296,
+  "environment": "production",
+  "service": "brick-x-auth-service",
+  "description": "Authentication Service"
+}
+```
 ```bash
-curl http://localhost:17101/VERSION
+curl http://localhost:17101/version
 ```
 
 ## 🧪 Testing

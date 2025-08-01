@@ -72,8 +72,8 @@ Brick X 认证服务，提供 JWT 令牌生成和验证功能。
 - `GET /health` - 健康检查
 - `POST /auth/login` - 用户登录
 - `GET /auth/me` - 获取当前用户信息
-- `GET /build-info.json` - 构建信息
-- `GET /VERSION` - 版本信息
+- `GET /version` - 版本信息 (返回JSON格式，包含版本号和构建信息)
+- `GET /build-info.json` - 构建信息 (返回JSON格式)
 
 ## 🔐 认证
 
@@ -117,14 +117,41 @@ curl -X GET http://localhost:17101/auth/me \
 curl http://localhost:17101/health
 ```
 
+### 版本信息
+```bash
+curl http://localhost:17101/version
+```
+
+响应格式示例:
+```json
+{
+  "version": "0.1.0-dev",
+  "buildInfo": {
+    "buildDateTime": "2023-10-20T12:34:56Z",
+    "environment": "production",
+    "service": "brick-x-auth-service"
+  }
+}
+```
+
 ### 构建信息
 ```bash
 curl http://localhost:17101/build-info.json
 ```
 
-### 版本信息
+响应格式示例:
+```json
+{
+  "version": "0.1.0-dev",
+  "buildDateTime": "2023-10-20T12:34:56Z",
+  "buildTimestamp": 1697805296,
+  "environment": "production",
+  "service": "brick-x-auth-service",
+  "description": "Authentication Service"
+}
+```
 ```bash
-curl http://localhost:17101/VERSION
+curl http://localhost:17101/version
 ```
 
 ## 🧪 测试

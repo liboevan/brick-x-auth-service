@@ -41,5 +41,4 @@ Thumbs.db
 .env.production
 
 # Docker build artifacts
-build-info.json
-VERSION 
+VERSION
