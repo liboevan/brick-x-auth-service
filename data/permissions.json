@@ -3,6 +3,8 @@
   "x/core:write",
   "x/clock:read",
   "x/clock:write",
+  "x/smart:read",
+  "x/smart:write",
   "x/remote_storage:read",
   "x/remote_storage:write",
   "x/system_status:read",
