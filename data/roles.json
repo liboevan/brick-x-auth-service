@@ -6,8 +6,7 @@
       "x/clock:read",
       "x/smart:read",
       "x/remote_storage:read",
-      "x/system_status:read",
-      "x/layout:read"
+      "x/system_status:read"
     ]
   },
   {
@@ -17,8 +16,7 @@
       "x/clock:read", "x/clock:write",
       "x/smart:read", "x/smart:write",
       "x/remote_storage:read", "x/remote_storage:write",
-      "x/system_status:read", "x/system_status:write",
-      "x/layout:read"
+      "x/system_status:read", "x/system_status:write"
     ]
   },
   {
