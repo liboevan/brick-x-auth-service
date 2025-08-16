@@ -47,6 +47,8 @@ func (a *App) setupRoutes() {
 	authRouter.HandleFunc("/exchange", a.exchangeHandler).Methods("POST")
 	authRouter.HandleFunc("/validate", a.validateHandler).Methods("POST")
 	authRouter.HandleFunc("/me", a.meHandler).Methods("GET")
+	authRouter.HandleFunc("/verify", a.verifyHandler).Methods("GET")
+	authRouter.HandleFunc("/authorize", a.authorizeHandler).Methods("GET")
 	authRouter.HandleFunc("/auth-type", a.requirePermission(a.getAuthTypeHandler, "x/layout:read")).Methods("GET")
 	authRouter.HandleFunc("/auth-type", a.requirePermission(a.setAuthTypeHandler, "x/layout:write")).Methods("POST")
 
@@ -209,6 +211,38 @@ func (a *App) meHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userInfo)
+}
+
+func (a *App) verifyHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract token from Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Authorization header required", http.StatusUnauthorized)
+		return
+	}
+
+	// Check if it's a Bearer token
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Invalid authorization format", http.StatusUnauthorized)
+		return
+	}
+
+	// Extract token
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Validate token
+	valid, _, err := a.authManager.ValidateToken(token)
+	if err != nil || !valid {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	// Token is valid, return 200 OK
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status": "valid",
+		"message": "Token is valid",
+	})
 }
 
 func (a *App) disableLocalLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -416,6 +450,60 @@ func (a *App) deleteRoleHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Role deleted"})
 }
+func (a *App) authorizeHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract token from Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Authorization header required", http.StatusUnauthorized)
+		return
+	}
+
+	// Check if it's a Bearer token
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Invalid authorization format", http.StatusUnauthorized)
+		return
+	}
+
+	// Extract token
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Validate token and get user info
+	valid, userInfo, err := a.authManager.ValidateToken(token)
+	if err != nil || !valid {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	// Get scope parameter from query string
+	scope := r.URL.Query().Get("scope")
+	if scope == "" {
+		http.Error(w, "Scope parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	// Check if user has required permission
+	hasPermission := false
+	for _, permission := range userInfo.Permissions {
+		if permission == scope {
+			hasPermission = true
+			break
+		}
+	}
+
+	if !hasPermission {
+		http.Error(w, "Insufficient permissions", http.StatusUnauthorized)
+		return
+	}
+
+	// Permission is valid, return 200 OK
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status": "authorized",
+		"message": "Permission is valid",
+		"scope": scope,
+	})
+}
+
 // Permission Management API Handlers
 func (a *App) getPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	perms, err := a.authManager.GetPermissions()
