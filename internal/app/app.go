@@ -451,21 +451,26 @@ func (a *App) deleteRoleHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "Role deleted"})
 }
 func (a *App) authorizeHandler(w http.ResponseWriter, r *http.Request) {
-	// Extract token from Authorization header
+	// Extract token from Authorization header first
 	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		http.Error(w, "Authorization header required", http.StatusUnauthorized)
-		return
-	}
+	token := ""
 
-	// Check if it's a Bearer token
-	if !strings.HasPrefix(authHeader, "Bearer ") {
-		http.Error(w, "Invalid authorization format", http.StatusUnauthorized)
-		return
+	// Check if Authorization header exists and is in Bearer format
+	if authHeader != "" {
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			token = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			http.Error(w, "Invalid authorization format", http.StatusUnauthorized)
+			return
+		}
+	} else {
+		// If no Authorization header, try to get token from jwt_token query parameter
+		token = r.URL.Query().Get("jwt_token")
+		if token == "" {
+			http.Error(w, "Authorization header or jwt_token parameter required", http.StatusUnauthorized)
+			return
+		}
 	}
-
-	// Extract token
-	token := strings.TrimPrefix(authHeader, "Bearer ")
 
 	// Validate token and get user info
 	valid, userInfo, err := a.authManager.ValidateToken(token)
